@@ -1,0 +1,8 @@
+main: kr.entree.packetsniffer.PacketSniffer
+name: PacketSniffer
+version: @version@
+authors: [EntryPoint]
+depend: [ProtocolLib]
+commands:
+  packetsniffer:
+    aliases: [psniff, ps]
