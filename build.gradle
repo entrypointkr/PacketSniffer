@@ -1,7 +1,6 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-
 plugins {
     id 'java'
+    id 'kr.entree.spigradle' version '1.1.4'
 }
 
 group 'kr.entree'
@@ -11,21 +10,22 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-    maven { url "http://repo.dmulloy2.net/nexus/repository/public/" }
+    protocolLib()
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
-    compileOnly group: 'com.comphenix.protocol', name: 'ProtocolLib', version: '4.4.0-SNAPSHOT'
+    compileOnly spigot('1.12.2')
+    compileOnly protocolLib()
     compileOnly fileTree('include': '*.jar', 'dir': 'libs')
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-processResources {
-    filteringCharset = 'UTF-8'
-    filter ReplaceTokens, tokens: [
-            'version': project.version
-    ]
+spigot {
+    authors = ['EntryPoint']
+    depends = ['ProtocolLib']
+    commands {
+        packetsniffer {
+            aliases = ['psniff', 'ps']
+        }
+    }
 }
