@@ -5,6 +5,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketOutputHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import java.time.Duration;
@@ -51,6 +52,14 @@ public class PacketMonitor extends PacketAdapter {
         snapshotQueue = new ArrayList<>();
     }
 
+    private void ensureThread(Runnable runnable) {
+        if (Bukkit.isPrimaryThread()) {
+            runnable.run();
+        } else {
+            Bukkit.getScheduler().runTask(plugin, runnable);
+        }
+    }
+
     @Override
     public void onPacketSending(PacketEvent event) {
         event.getNetworkMarker().addOutputHandler(new RawHandler());
@@ -84,9 +93,9 @@ public class PacketMonitor extends PacketAdapter {
             }
             Duration diff = Duration.between(start, LocalTime.now());
             if (diff.getSeconds() >= 1) {
-                takeSnapshot();
+                ensureThread(PacketMonitor.this::takeSnapshot);
             }
-            snapshotQueue.add(new Packet(event.getPacketType(), bytes.length));
+            ensureThread(() -> snapshotQueue.add(new Packet(event.getPacketType(), bytes.length)));
             return bytes;
         }
     }
